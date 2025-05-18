@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
-
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = "ppp";
 const port = 3000;
 app.use(express.json());
 const users = [];
@@ -36,10 +37,13 @@ app.post("/signin", (req, res) => {
     const user = users.find(user => user.username === username && user.password === password);
 
     if (user) {
-        const token = generateToken();
-        user.token = token;
-        res.send({
-            token
+        const token = jwt.sign({
+            username: username
+        }, JWT_SECRET);
+        //user.token = token;
+        res.json({
+            token : token,
+            message: "You have signed in cutie"
         })
         console.log(users);
     } else {
@@ -52,7 +56,11 @@ app.post("/signin", (req, res) => {
  
 app.get('/me' , (req, res) => {
     const token = req.headers.token;
-    const user = users.find(user => user.token === token);
+
+    const decodedInformation = jwt.verify(token, JWT_SECRET);
+    const username = decodedInformation.username;
+
+    const user = users.find(user => user.username === username);
     if (user) {
         res.json({
             username: user.username,
