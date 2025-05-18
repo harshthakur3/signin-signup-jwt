@@ -50,6 +50,19 @@ app.post("/signin", (req, res) => {
 });
 
  
-
-
+app.get('/me' , (req, res) => {
+    const token = req.headers.token;
+    const user = users.find(user => user.token === token);
+    if (user) {
+        res.json({
+            username: user.username,
+            message: "Welcome back " + user.username,
+            password: user.password
+        });
+    } else {
+        res.json({
+            message: "You are not logged in"
+        });
+    }
+});
 app.listen(port);
